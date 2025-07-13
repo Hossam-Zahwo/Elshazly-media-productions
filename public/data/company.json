@@ -1,0 +1,44 @@
+[
+  {
+    "id": 301,
+    "title": "Company Promo Video",
+    "type": "video",
+    "url": "https://www.youtube.com/embed/company1",
+    "section": "Company"
+  },
+  {
+    "id": 302,
+    "title": "Office Daylight Shoot",
+    "type": "image",
+    "url": "https://example.com/company2.jpg",
+    "section": "Company"
+  },
+  {
+    "id": 303,
+    "title": "Team Meeting Highlights",
+    "type": "image",
+    "url": "https://example.com/team-meeting.jpg",
+    "section": "Company"
+  },
+  {
+    "id": 304,
+    "title": "CEO Interview",
+    "type": "video",
+    "url": "https://www.youtube.com/embed/ceo-interview",
+    "section": "Company"
+  },
+  {
+    "id": 305,
+    "title": "New Office Tour",
+    "type": "video",
+    "url": "https://www.youtube.com/embed/office-tour",
+    "section": "Company"
+  },
+  {
+    "id": 306,
+    "title": "Staff Profile Photo Session",
+    "type": "image",
+    "url": "https://example.com/staff-photoshoot.jpg",
+    "section": "Company"
+  }
+]

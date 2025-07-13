@@ -1,0 +1,44 @@
+[
+  {
+    "id": 101,
+    "title": "Corporate Event Highlights",
+    "type": "video",
+    "url": "https://www.youtube.com/embed/events1",
+    "section": "Events"
+  },
+  {
+    "id": 102,
+    "title": "Live Concert Coverage",
+    "type": "image",
+    "url": "https://example.com/event2.jpg",
+    "section": "Events"
+  },
+  {
+    "id": 103,
+    "title": "Tech Conference 2024",
+    "type": "video",
+    "url": "https://www.youtube.com/embed/techconf2024",
+    "section": "Events"
+  },
+  {
+    "id": 104,
+    "title": "Gala Dinner Setup",
+    "type": "image",
+    "url": "https://example.com/gala-dinner.jpg",
+    "section": "Events"
+  },
+  {
+    "id": 105,
+    "title": "Fashion Show Lighting",
+    "type": "image",
+    "url": "https://example.com/fashion-show.jpg",
+    "section": "Events"
+  },
+  {
+    "id": 106,
+    "title": "Event Highlights - Summer Fest",
+    "type": "video",
+    "url": "https://www.youtube.com/embed/summerfest",
+    "section": "Events"
+  }
+]
