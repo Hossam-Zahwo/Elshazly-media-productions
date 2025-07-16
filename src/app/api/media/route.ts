@@ -1,46 +1,44 @@
-import { NextResponse } from 'next/server';
-import fs from 'fs';
+import { NextRequest, NextResponse } from 'next/server';
 import path from 'path';
+import { promises as fs } from 'fs';
 
-export async function POST(request: Request) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const id = params.id;
+  const section = request.nextUrl.searchParams.get('section');
+
+  if (!section) {
+    return NextResponse.json({ error: 'Section is required' }, { status: 400 });
+  }
+
+  const filePath = path.join(process.cwd(), 'public', 'data', `${section}.json`);
+
   try {
-    const body = await request.json();
-    const { section } = body;
+    // تحقق أولاً من وجود الملف
+    await fs.access(filePath);
 
-    if (!section) {
-      return NextResponse.json({ error: 'Section is required' }, { status: 400 });
+    const file = await fs.readFile(filePath, 'utf-8');
+    let data: any[] = [];
+    try {
+      data = JSON.parse(file);
+    } catch (jsonError) {
+      return NextResponse.json({ error: 'Invalid JSON format' }, { status: 500 });
     }
 
-    const filePath = path.join(process.cwd(), 'public', 'data', `${section.toLowerCase()}.json`);
-    const fileData = fs.existsSync(filePath) ? fs.readFileSync(filePath, 'utf-8') : '[]';
-    const data = JSON.parse(fileData);
+    const item = data.find((i: any) => String(i.id) === id);
 
-    const newItem = { id: Date.now(), ...body };
-    data.push(newItem);
-    fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+    if (!item) {
+      return NextResponse.json({ error: 'Item not found' }, { status: 404 });
+    }
 
-    return NextResponse.json(newItem);
-  } catch (error) {
-    console.error('❌ Error:', error);
-    return NextResponse.json({ error: 'Something went wrong' }, { status: 500 });
+    return NextResponse.json(item);
+  } catch (error: any) {
+    if (error.code === 'ENOENT') {
+      return NextResponse.json({ error: 'Section file not found' }, { status: 404 });
+    }
+    console.error('❌ Error reading file:', error);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
-}
-
-export async function DELETE(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const section = searchParams.get('section');
-  const id = searchParams.get('id');
-
-  if (!section || !id) {
-    return NextResponse.json({ error: 'section and id are required' }, { status: 400 });
-  }
-
-  const filePath = path.join(process.cwd(), 'public', 'data', `${section.toLowerCase()}.json`);
-  const fileData = fs.existsSync(filePath) ? fs.readFileSync(filePath, 'utf-8') : '[]';
-  const data = JSON.parse(fileData);
-
-  const filtered = data.filter((item: any) => item.id !== Number(id));
-  fs.writeFileSync(filePath, JSON.stringify(filtered, null, 2));
-
-  return NextResponse.json({ success: true });
 }
