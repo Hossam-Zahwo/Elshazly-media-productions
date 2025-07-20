@@ -3,8 +3,11 @@ import { doc, getDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 
 // ✅ GET - get item by id
-export async function GET(request: NextRequest) {
-  const id = request.nextUrl.pathname.split('/').pop(); // استخراج id من URL
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const { id } = params; // استخراج الـ id من params
 
   if (!id) {
     return NextResponse.json({ error: 'Invalid ID' }, { status: 400 });
@@ -26,8 +29,11 @@ export async function GET(request: NextRequest) {
 }
 
 // 🗑️ DELETE - delete item by id
-export async function DELETE(request: NextRequest) {
-  const id = request.nextUrl.pathname.split('/').pop(); // استخراج id من URL
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const { id } = params; // استخراج الـ id من params
 
   if (!id) {
     return NextResponse.json({ error: 'Invalid ID' }, { status: 400 });
