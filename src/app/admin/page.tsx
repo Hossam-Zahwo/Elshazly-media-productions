@@ -26,10 +26,8 @@ export default function AdminPage() {
   const sections = ['Wedding', 'Events', 'Production', 'Company', 'Catering', 'Showreel'];
 
   useEffect(() => {
-    if (!form.section) return;
-
     const fetchData = async () => {
-      const snapshot = await getDocs(collection(db, form.section));
+      const snapshot = await getDocs(collection(db, 'media'));
       const items = snapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data(),
@@ -39,7 +37,7 @@ export default function AdminPage() {
     };
 
     fetchData();
-  }, [form.section]);
+  }, []);
 
   useEffect(() => {
     if (message) {
@@ -51,7 +49,7 @@ export default function AdminPage() {
   const addMedia = async () => {
     if (!form.section) return alert('Please select a section first.');
 
-    const docRef = await addDoc(collection(db, form.section), {
+    const docRef = await addDoc(collection(db, 'media'), {
       title: form.title,
       url: form.url,
       type: form.type,
@@ -71,9 +69,7 @@ export default function AdminPage() {
   };
 
   const deleteMedia = async (id: string) => {
-    if (!form.section) return;
-
-    await deleteDoc(doc(db, form.section, id));
+    await deleteDoc(doc(db, 'media', id));
     setMedia(prev => prev.filter(m => m.id !== id));
     setMessage('🗑️ Successfully deleted');
   };
@@ -131,10 +127,10 @@ export default function AdminPage() {
       {/* ✅ Media List */}
       <div className="grid gap-4">
         {media.length === 0 ? (
-          <p className="text-gray-400">No media items added for this section yet.</p>
+          <p className="text-gray-400">No media items added yet.</p>
         ) : (
           media.map((item) => (
-            <div  key={item.id}  className="bg-gray-900 p-3 rounded flex justify-between items-center shadow">
+            <div key={item.id} className="bg-gray-900 p-3 rounded flex justify-between items-center shadow">
               <div>
                 <div className="font-semibold text-sm">{item.title}</div>
                 <div className="text-xs text-gray-400">{item.section} • {item.type}</div>

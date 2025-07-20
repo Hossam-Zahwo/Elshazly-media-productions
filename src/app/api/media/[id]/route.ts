@@ -7,7 +7,7 @@ export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const { id } = params; 
+  const { id } = params; // استخراج الـ id من params
 
   if (!id) {
     return NextResponse.json({ error: 'Invalid ID' }, { status: 400 });
