@@ -2,9 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { doc, getDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 
-// ✅ GET - get item by id
-export async function GET(request: NextRequest, context: { params: { id: string } }) {
-  const id = context.params.id;
+// ✅ GET - Get media item by ID
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const id = params.id;
 
   if (!id) {
     return NextResponse.json({ error: 'Invalid ID' }, { status: 400 });
@@ -25,9 +28,12 @@ export async function GET(request: NextRequest, context: { params: { id: string 
   }
 }
 
-// 🗑️ DELETE - delete item by id
-export async function DELETE(request: NextRequest, context: { params: { id: string } }) {
-  const id = context.params.id;
+// 🗑️ DELETE - Delete media item by ID
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const id = params.id;
 
   if (!id) {
     return NextResponse.json({ error: 'Invalid ID' }, { status: 400 });
@@ -36,7 +42,6 @@ export async function DELETE(request: NextRequest, context: { params: { id: stri
   try {
     const docRef = doc(db, 'media', id);
     await deleteDoc(docRef);
-
     return NextResponse.json({ message: 'Deleted successfully' });
   } catch (error) {
     console.error('❌ Error deleting document:', error);
