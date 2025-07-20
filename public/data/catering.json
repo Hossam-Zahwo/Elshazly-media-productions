@@ -1,0 +1,44 @@
+[
+  {
+    "id": 401,
+    "title": "Catering Commercial - Fine Dining",
+    "type": "video",
+    "url": "https://www.youtube.com/embed/catering1",
+    "section": "Catering"
+  },
+  {
+    "id": 402,
+    "title": "Food Plating Photography",
+    "type": "image",
+    "url": "https://example.com/catering2.jpg",
+    "section": "Catering"
+  },
+  {
+    "id": 403,
+    "title": "Buffet Setup for Gala Dinner",
+    "type": "image",
+    "url": "https://example.com/buffet-setup.jpg",
+    "section": "Catering"
+  },
+  {
+    "id": 404,
+    "title": "Behind the Scenes - Chef at Work",
+    "type": "video",
+    "url": "https://www.youtube.com/embed/chef-in-action",
+    "section": "Catering"
+  },
+  {
+    "id": 405,
+    "title": "Premium Dessert Shots",
+    "type": "image",
+    "url": "https://example.com/dessert.jpg",
+    "section": "Catering"
+  },
+  {
+    "id": 406,
+    "title": "Catering Promo - Summer Menu",
+    "type": "video",
+    "url": "https://www.youtube.com/embed/summer-menu",
+    "section": "Catering"
+  }
+]

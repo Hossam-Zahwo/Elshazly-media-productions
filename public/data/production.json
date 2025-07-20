@@ -1,0 +1,44 @@
+[
+  {
+    "id": 201,
+    "title": "Product Commercial Shoot",
+    "type": "video",
+    "url": "https://www.youtube.com/embed/production1",
+    "section": "Production"
+  },
+  {
+    "id": 202,
+    "title": "Editing Room Setup",
+    "type": "image",
+    "url": "https://example.com/production2.jpg",
+    "section": "Production"
+  },
+  {
+    "id": 203,
+    "title": "Behind the Scenes - Lighting Setup",
+    "type": "image",
+    "url": "https://example.com/lighting-bts.jpg",
+    "section": "Production"
+  },
+  {
+    "id": 204,
+    "title": "Camera Movement Demo",
+    "type": "video",
+    "url": "https://www.youtube.com/embed/camera-move",
+    "section": "Production"
+  },
+  {
+    "id": 205,
+    "title": "Studio Sound Check",
+    "type": "image",
+    "url": "https://example.com/sound-check.jpg",
+    "section": "Production"
+  },
+  {
+    "id": 206,
+    "title": "Green Screen Effects Test",
+    "type": "video",
+    "url": "https://www.youtube.com/embed/greenscreen-test",
+    "section": "Production"
+  }
+]
