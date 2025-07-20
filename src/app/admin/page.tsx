@@ -1,8 +1,17 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { MediaItem } from '../lib/media';
+import { collection, addDoc, deleteDoc, doc, getDocs } from 'firebase/firestore';
+import { db } from '../lib/firebase';
 import { FaPlusCircle, FaTrashAlt } from 'react-icons/fa';
+
+type MediaItem = {
+  id: string;
+  title: string;
+  url: string;
+  section: string;
+  type: 'image' | 'video';
+};
 
 export default function AdminPage() {
   const [media, setMedia] = useState<MediaItem[]>([]);
@@ -16,15 +25,20 @@ export default function AdminPage() {
 
   const sections = ['Wedding', 'Events', 'Production', 'Company', 'Catering', 'Showreel'];
 
-  const getFileName = (section: string) => section.toLowerCase() + '.json';
-
   useEffect(() => {
     if (!form.section) return;
-    const file = getFileName(form.section);
-    fetch(`/data/${file}`)
-      .then(res => res.json())
-      .then(setMedia)
-      .catch(() => setMedia([]));
+
+    const fetchData = async () => {
+      const snapshot = await getDocs(collection(db, form.section));
+      const items = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      })) as MediaItem[];
+
+      setMedia(items);
+    };
+
+    fetchData();
   }, [form.section]);
 
   useEffect(() => {
@@ -37,46 +51,32 @@ export default function AdminPage() {
   const addMedia = async () => {
     if (!form.section) return alert('Please select a section first.');
 
-    const res = await fetch(`/api/media?section=${form.section}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        title: form.title,
-        url: form.url,
-        type: form.type,
-      }),
+    const docRef = await addDoc(collection(db, form.section), {
+      title: form.title,
+      url: form.url,
+      type: form.type,
+      section: form.section,
     });
 
-    const result = await res.json();
+    setMedia(prev => [
+      ...prev,
+      {
+        id: docRef.id,
+        ...form,
+      },
+    ]);
 
-    if (!res.ok || result.error) {
-      alert(result.error || 'An error occurred while adding.');
-      return;
-    }
-
-    setMedia(prev => [...prev, result.item]);
     setMessage('✅ Successfully added');
     setForm({ title: '', type: 'image', url: '', section: form.section });
   };
 
-const deleteMedia = async (id: number) => {
-  if (!form.section) return;
+  const deleteMedia = async (id: string) => {
+    if (!form.section) return;
 
-  const res = await fetch(`/api/media/${id}?section=${form.section}`, {
-    method: 'DELETE',
-  });
-
-  const result = await res.json();
-
-  if (!res.ok || result.error) {
-    alert(result.error || 'An error occurred while deleting.');
-    return;
-  }
-
-  setMedia(prev => prev.filter(m => m.id !== id));
-  setMessage('🗑️ Successfully deleted');
-};
-
+    await deleteDoc(doc(db, form.section, id));
+    setMedia(prev => prev.filter(m => m.id !== id));
+    setMessage('🗑️ Successfully deleted');
+  };
 
   return (
     <div className="p-6 text-white bg-black min-h-screen">
@@ -133,8 +133,8 @@ const deleteMedia = async (id: number) => {
         {media.length === 0 ? (
           <p className="text-gray-400">No media items added for this section yet.</p>
         ) : (
-          media.map((item) => (
-            <div key={item.id} className="bg-gray-900 p-3 rounded flex justify-between items-center shadow">
+          media.map((item, index) => (
+            <div key={`${item.id}-${index}`} className="bg-gray-900 p-3 rounded flex justify-between items-center shadow">
               <div>
                 <div className="font-semibold text-sm">{item.title}</div>
                 <div className="text-xs text-gray-400">{item.section} • {item.type}</div>

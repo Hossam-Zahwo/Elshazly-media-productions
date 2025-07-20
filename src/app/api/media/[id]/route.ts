@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import path from 'path';
-import { promises as fs } from 'fs';
+import { doc, getDoc, deleteDoc } from 'firebase/firestore';
+import { db } from '../../../lib/firebase';
 
 // 📌 GET - get item by id
 export async function GET(
@@ -8,27 +8,18 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   const id = params.id;
-  const section = request.nextUrl.searchParams.get('section');
-
-  if (!section) {
-    return NextResponse.json({ error: 'Section is required' }, { status: 400 });
-  }
-
-  const filePath = path.join(process.cwd(), 'public', 'data', `${section}.json`);
 
   try {
-    const file = await fs.readFile(filePath, 'utf-8');
-    const data = JSON.parse(file);
+    const docRef = doc(db, 'media', id);
+    const docSnap = await getDoc(docRef);
 
-    const item = data.find((i: any) => String(i.id) === id);
-
-    if (!item) {
+    if (!docSnap.exists()) {
       return NextResponse.json({ error: 'Item not found' }, { status: 404 });
     }
 
-    return NextResponse.json(item);
+    return NextResponse.json({ id: docSnap.id, ...docSnap.data() });
   } catch (error) {
-    console.error('❌ Error reading file:', error);
+    console.error('❌ Error getting document:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
@@ -39,30 +30,14 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   const id = params.id;
-  const section = request.nextUrl.searchParams.get('section');
-
-  if (!section) {
-    return NextResponse.json({ error: 'Section is required' }, { status: 400 });
-  }
-
-  const filePath = path.join(process.cwd(), 'public', 'data', `${section}.json`);
 
   try {
-    const file = await fs.readFile(filePath, 'utf-8');
-    let data = JSON.parse(file);
-
-    const newData = data.filter((item: any) => String(item.id) !== id);
-
-    // لو مفيش تغيير
-    if (newData.length === data.length) {
-      return NextResponse.json({ error: 'Item not found' }, { status: 404 });
-    }
-
-    await fs.writeFile(filePath, JSON.stringify(newData, null, 2), 'utf-8');
+    const docRef = doc(db, 'media', id);
+    await deleteDoc(docRef);
 
     return NextResponse.json({ message: 'Deleted successfully' });
   } catch (error) {
-    console.error('❌ Error deleting item:', error);
+    console.error('❌ Error deleting document:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }

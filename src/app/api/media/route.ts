@@ -1,8 +1,9 @@
+// app/api/media/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import path from 'path';
-import { promises as fs } from 'fs';
+import { db } from '../../lib/firebase';
+import { collection, addDoc, getDocs, query, where } from 'firebase/firestore';
 
-// جلب كل العناصر في الملف حسب القسم (section)
+// 📦 جلب كل العناصر حسب القسم
 export async function GET(request: NextRequest) {
   const section = request.nextUrl.searchParams.get('section');
 
@@ -10,26 +11,23 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Section is required' }, { status: 400 });
   }
 
-  const filePath = path.join(process.cwd(), 'public', 'data', `${section}.json`);
-
   try {
-    await fs.access(filePath);
+    const q = query(collection(db, 'media'), where('section', '==', section));
+    const snapshot = await getDocs(q);
 
-    const file = await fs.readFile(filePath, 'utf-8');
-    const data = JSON.parse(file);
+    const data = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
 
     return NextResponse.json(data, { status: 200 });
-  } catch (error: any) {
-    if (error.code === 'ENOENT') {
-      return NextResponse.json([], { status: 200 }); // لو الملف مش موجود، رجّع مصفوفة فاضية
-    }
-
-    console.error('❌ Error reading file:', error);
+  } catch (error) {
+    console.error('❌ Error reading from Firestore:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
 
-// إضافة عنصر جديد إلى القسم
+// ➕ إضافة عنصر جديد إلى القسم
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -39,33 +37,20 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Section is required' }, { status: 400 });
     }
 
-    const filePath = path.join(process.cwd(), 'public', 'data', `${section}.json`);
-
-    let data: any[] = [];
-
-    try {
-      const file = await fs.readFile(filePath, 'utf-8');
-      data = JSON.parse(file);
-    } catch (error: any) {
-      if (error.code !== 'ENOENT') {
-        console.error('❌ Error reading file:', error);
-        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
-      }
-      // لو الملف مش موجود، نبدأ بمصفوفة فاضية
-    }
-
     const newItem = {
       ...body,
-      id: Date.now(), // توليد ID مؤقت باستخدام التوقيت
+      section,
+      createdAt: Date.now(),
     };
 
-    data.push(newItem);
+    const docRef = await addDoc(collection(db, 'media'), newItem);
 
-    await fs.writeFile(filePath, JSON.stringify(data, null, 2), 'utf-8');
-
-    return NextResponse.json({ message: 'Item added successfully', item: newItem }, { status: 201 });
+    return NextResponse.json(
+      { message: 'Item added successfully', item: { id: docRef.id, ...newItem } },
+      { status: 201 }
+    );
   } catch (error) {
-    console.error('❌ POST error:', error);
+    console.error('❌ Error adding to Firestore:', error);
     return NextResponse.json({ error: 'Invalid JSON or server error' }, { status: 400 });
   }
 }
