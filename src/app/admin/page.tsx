@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { MediaItem } from '../lib/media';
-import { FaPlusCircle, FaTrashAlt } from 'react-icons/fa'; // ✅ استيراد الأيقونات
+import { FaPlusCircle, FaTrashAlt } from 'react-icons/fa';
 
 export default function AdminPage() {
   const [media, setMedia] = useState<MediaItem[]>([]);
@@ -37,10 +37,14 @@ export default function AdminPage() {
   const addMedia = async () => {
     if (!form.section) return alert('Please select a section first.');
 
-    const res = await fetch('/api/media', {
+    const res = await fetch(`/api/media?section=${form.section}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form),
+      body: JSON.stringify({
+        title: form.title,
+        url: form.url,
+        type: form.type,
+      }),
     });
 
     const result = await res.json();
@@ -50,21 +54,29 @@ export default function AdminPage() {
       return;
     }
 
-    setMedia(prev => [...prev, result]);
+    setMedia(prev => [...prev, result.item]);
     setMessage('✅ Successfully added');
     setForm({ title: '', type: 'image', url: '', section: form.section });
   };
 
-  const deleteMedia = async (id: number) => {
-    if (!form.section) return;
+const deleteMedia = async (id: number) => {
+  if (!form.section) return;
 
-    await fetch(`/api/media?section=${form.section}&id=${id}`, {
-      method: 'DELETE',
-    });
+  const res = await fetch(`/api/media/${id}?section=${form.section}`, {
+    method: 'DELETE',
+  });
 
-    setMedia(prev => prev.filter(m => m.id !== id));
-    setMessage('🗑️ Successfully deleted');
-  };
+  const result = await res.json();
+
+  if (!res.ok || result.error) {
+    alert(result.error || 'An error occurred while deleting.');
+    return;
+  }
+
+  setMedia(prev => prev.filter(m => m.id !== id));
+  setMessage('🗑️ Successfully deleted');
+};
+
 
   return (
     <div className="p-6 text-white bg-black min-h-screen">
