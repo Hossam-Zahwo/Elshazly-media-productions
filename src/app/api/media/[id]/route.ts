@@ -2,12 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { doc, getDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 
-// 📌 GET - get item by id
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const id = params.id;
+// ✅ GET - get item by id
+export async function GET(request: NextRequest, context: { params: { id: string } }) {
+  const id = context.params.id;
+
+  if (!id) {
+    return NextResponse.json({ error: 'Invalid ID' }, { status: 400 });
+  }
 
   try {
     const docRef = doc(db, 'media', id);
@@ -25,11 +26,12 @@ export async function GET(
 }
 
 // 🗑️ DELETE - delete item by id
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const id = params.id;
+export async function DELETE(request: NextRequest, context: { params: { id: string } }) {
+  const id = context.params.id;
+
+  if (!id) {
+    return NextResponse.json({ error: 'Invalid ID' }, { status: 400 });
+  }
 
   try {
     const docRef = doc(db, 'media', id);
