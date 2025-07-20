@@ -133,8 +133,8 @@ export default function AdminPage() {
         {media.length === 0 ? (
           <p className="text-gray-400">No media items added for this section yet.</p>
         ) : (
-          media.map((item, index) => (
-            <div key={`${item.id}-${index}`} className="bg-gray-900 p-3 rounded flex justify-between items-center shadow">
+          media.map((item) => (
+            <div  key={item.id}  className="bg-gray-900 p-3 rounded flex justify-between items-center shadow">
               <div>
                 <div className="font-semibold text-sm">{item.title}</div>
                 <div className="text-xs text-gray-400">{item.section} • {item.type}</div>
